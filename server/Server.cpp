@@ -2,13 +2,15 @@
 #include <iostream>  
 #include <boost/asio.hpp>
 
+#include <Decryptor.h>
+
 using namespace boost::asio;
 
 int main() {
 
-    auto read_message = [](ip::tcp::socket& socket) -> std::string {
+    auto readString = [](ip::tcp::socket& socket) -> std::string {
         boost::asio::streambuf buf;
-        boost::asio::read_until(socket, buf, "\n");
+        boost::asio::read_until(socket, buf, "\0");
         std::string data = boost::asio::buffer_cast<const char*>(buf.data());
         return data;
     };
@@ -17,17 +19,22 @@ int main() {
     std::string message;
 
     //listen for new connection  
-    ip::tcp::acceptor acceptor_(io_service, ip::tcp::endpoint(ip::tcp::v4(), 1234));
+    ip::tcp::acceptor acceptor(io_service, ip::tcp::endpoint(ip::tcp::v4(), 1234));
 
     //socket creation  
-    ip::tcp::socket socket_(io_service);
+    ip::tcp::socket socket(io_service);
 
     //waiting for the connection  
-    acceptor_.accept(socket_);
+    acceptor.accept(socket);
 
-    //read operation 
-    message = read_message(socket_);
-    std::cout << message << std::endl;
+    //read operation
+    auto key        = readString(socket);
+    auto initVec    = readString(socket);
+
+    Decryptor decryptor(key, initVec);
+    decryptor.showKeyAndInitVec();
+    message = readString(socket);
+    std::cout << "Decrypted message: " << decryptor.decrypt(message) << std::endl;
 
     return 0;
 }
