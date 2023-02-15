@@ -1,12 +1,14 @@
-#set(TARGET Crypto)
+set(TARGET Crypto)
 
-set(SOURCE_FILES crypto.cpp)
+set(SOURCE_FILES
+	CryptoKey.h
+	ICrypto.h
+	Encryptor.h
+	Encryptor.cpp
+	Decryptor.h
+	Decryptor.cpp
+	)
 
-list(APPEND CMAKE_MODULE_PATH "D:/GitHub/vcpkg/installed/x86-windows/include")
-
-set(CryptoPP_INCLUDE_DIR D:/GitHub/vcpkg/installed/x86-windows/include)
-set(CryptoPP_LIBRARY D:/GitHub/vcpkg/installed/x86-windows/lib)
-
-include_directories(${CryptoPP_INCLUDE_DIR})
-
-find_package(CryptoPP REQUIRED)
+find_package(cryptopp REQUIRED)
+add_library(${TARGET} STATIC ${SOURCE_FILES})
+target_link_libraries(${TARGET} PUBLIC cryptopp::cryptopp)
