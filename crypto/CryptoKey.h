@@ -6,7 +6,7 @@ using namespace CryptoPP;
 class CryptoKey
 {
 	SecByteBlock key	= SecByteBlock(AES::DEFAULT_KEYLENGTH);
-	SecByteBlock initVec	= SecByteBlock(AES::DEFAULT_KEYLENGTH);
+	SecByteBlock initVec	= SecByteBlock(12);
 
 public:
 	CryptoKey() = default;

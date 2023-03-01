@@ -19,9 +19,11 @@ int main() {
     // request/message from client  
     std::cin >> message;
 
+    const std::string authData("hashOfUsername");
+
     Encryptor encryptor;
     encryptor.generateKey();
-    message = encryptor.encrypt(message);
+    message = encryptor.encrypt(message, authData);
 
     boost::system::error_code error;
 
@@ -42,6 +44,15 @@ int main() {
     else {
         std::cout << "IV send failed: " << error.message() << std::endl;
     };
+
+    //sending authentification data
+    boost::asio::write(socket, boost::asio::buffer(authData), error);
+    if (!error) {
+        std::cout << "Authentification data was sended successfully" << std::endl;
+    }
+    else {
+        std::cout << "send failed: " << error.message() << std::endl;
+    }
 
     //sending encrypted message
     boost::asio::write(socket, boost::asio::buffer(message), error);

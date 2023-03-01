@@ -12,5 +12,7 @@ protected:
 		return complexKey;
 	}
 public:
+	const int TAG_SIZE = 16;
+
 	virtual ~ICrypto() = default;
 };

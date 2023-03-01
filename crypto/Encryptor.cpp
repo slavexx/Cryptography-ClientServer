@@ -5,8 +5,7 @@ void Encryptor::generateKey()
     AutoSeededRandomPool randomPool;
     
     randomPool.GenerateBlock(getComplexKey().getKeyPtr(), getComplexKey().getKeySize());
-    randomPool.GenerateBlock(getComplexKey().getInitVecPtr(), getComplexKey().getInitVecSize());
-
+    randomPool.GenerateBlock(getComplexKey().getInitVec(), getComplexKey().getInitVecSize());
     HexEncoder encoder(new FileSink(std::cout));
     std::cout << "key: ";
 
@@ -21,21 +20,25 @@ void Encryptor::generateKey()
 
 }
 
-std::string Encryptor::encrypt(const std::string& message)
+std::string Encryptor::encrypt(const std::string& message, const std::string& authData)
 {
     std::string cipheredMsg;
 
     try {
-        CBC_Mode<AES>::Encryption encryption;
+        GCM<AES, GCM_2K_Tables>::Encryption encryption;
         encryption.SetKeyWithIV(getComplexKey().getKeyPtr(), getComplexKey().getKeySize(), getComplexKey().getInitVecPtr());
 
-        StringSource strSrc(message, true,
-            new StreamTransformationFilter(encryption,
-                new StringSink(cipheredMsg)
-            )
+        AuthenticatedEncryptionFilter authEncFilter(encryption,
+            new StringSink(cipheredMsg), false, TAG_SIZE
         );
+
+        authEncFilter.ChannelPut(AAD_CHANNEL, reinterpret_cast<const byte*>(authData.data()), authData.size());
+        authEncFilter.ChannelMessageEnd(AAD_CHANNEL);
+
+        authEncFilter.ChannelPut(DEFAULT_CHANNEL, reinterpret_cast<const byte*>(message.data()), message.size());
+        authEncFilter.ChannelMessageEnd(DEFAULT_CHANNEL);
     }
-    catch (const Exception& e) {
+    catch (CryptoPP::Exception& e) {
         std::cerr << e.what() << std::endl;
     }
 

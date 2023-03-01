@@ -16,7 +16,7 @@ int main() {
     };
 
     boost::asio::io_service io_service;
-    std::string message;
+
 
     //listen for new connection  
     ip::tcp::acceptor acceptor(io_service, ip::tcp::endpoint(ip::tcp::v4(), 1234));
@@ -30,11 +30,18 @@ int main() {
     //read operation
     auto key        = readString(socket);
     auto initVec    = readString(socket);
+    auto authData    = readString(socket);
+    auto message = readString(socket);
+
+    //Attack the first and last byte of the encrypted data and tag(MAC)
+    //message[0] |= 0x0F;
+    //message[message.size() - 1] |= 0x0F;
 
     Decryptor decryptor(key, initVec);
     decryptor.showKeyAndInitVec();
-    message = readString(socket);
-    std::cout << "Decrypted message: " << decryptor.decrypt(message) << std::endl;
+
+    auto decryptedMsg = decryptor.decrypt(message, authData);
+    std::cout << "Decrypted message: " << decryptedMsg << std::endl;
 
     return 0;
 }
