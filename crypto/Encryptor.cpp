@@ -1,6 +1,6 @@
 #include "Encryptor.h"
 
-void Encryptor::generateKey()
+void Encryptor::generateComplexKey()
 {
     AutoSeededRandomPool randomPool;
     
