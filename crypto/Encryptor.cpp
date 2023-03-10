@@ -20,6 +20,44 @@ void Encryptor::generateComplexKey()
 
 }
 
+void Encryptor::regenerateKey()
+{
+    AutoSeededRandomPool randomPool;
+    //getComplexKey().getKey().New(getComplexKey().getKeySize());
+    getComplexKey().getKey().CleanNew(getComplexKey().getKeySize());
+    randomPool.GenerateBlock(getComplexKey().getKeyPtr(), getComplexKey().getKeySize());
+
+    HexEncoder encoder(new FileSink(std::cout));
+    std::cout << "New key: ";
+    encoder.Put(getComplexKey().getKeyPtr(), getComplexKey().getKeySize());
+    encoder.MessageEnd();
+    std::cout << std::endl;
+
+    std::cout << "Initial vector: ";
+    encoder.Put(getComplexKey().getInitVecPtr(), getComplexKey().getInitVecSize());
+    encoder.MessageEnd();
+    std::cout << std::endl;
+}
+
+void Encryptor::regenerateInitVec()
+{
+    AutoSeededRandomPool randomPool;
+    getComplexKey().getInitVec().CleanNew(getComplexKey().getInitVecSize());
+    randomPool.GenerateBlock(getComplexKey().getInitVec(), getComplexKey().getInitVecSize());
+
+    HexEncoder encoder(new FileSink(std::cout));
+
+    std::cout << "key: ";
+    encoder.Put(getComplexKey().getKeyPtr(), getComplexKey().getKeySize());
+    encoder.MessageEnd();
+    std::cout << std::endl;
+
+    std::cout << "New initial vector: ";
+    encoder.Put(getComplexKey().getInitVecPtr(), getComplexKey().getInitVecSize());
+    encoder.MessageEnd();
+    std::cout << std::endl;
+}
+
 std::string Encryptor::encrypt(const std::string& message, const std::string& authData)
 {
     std::string cipheredMsg;

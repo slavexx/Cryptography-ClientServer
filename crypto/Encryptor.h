@@ -8,6 +8,8 @@ class Encryptor : private ICrypto {
 public:
 	//TODO create key factory
 	void generateComplexKey();
+	void regenerateKey();
+	void regenerateInitVec();
 	std::string Encryptor::encrypt(const std::string& message, const std::string& authData);
 	//template
 	std::string keyToString();
