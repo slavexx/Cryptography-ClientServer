@@ -2,6 +2,4 @@
 
 include_directories(${BOOST_ROOT})
 
-target_include_directories(Server PUBLIC
-                          "${PROJECT_BINARY_DIR}"
-                          )
+target_link_libraries(Server PRIVATE cryptopp::cryptopp)
