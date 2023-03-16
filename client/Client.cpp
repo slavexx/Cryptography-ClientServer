@@ -68,6 +68,6 @@ int main() {
     else {
         std::cout << "Error in shared key computation";
     }
-
+    //hashing shared key and use it for encryprion
     return 0;
 }
